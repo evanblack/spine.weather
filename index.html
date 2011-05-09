@@ -1,0 +1,70 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>My Weather App</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="css/application.css">
+	
+  <script id="locationTemplate" type="text/html">
+    <div class="item">
+    	{{ zip }} (<a href="#" class="destroy">x</a>)
+    </div>
+  </script>
+  
+  <script id="weatherTemplate" type="text/html">
+    {{ temp }} - {{ text }}
+    <p>{{{ description }}}</p>
+  </script>	  
+
+</head>
+
+<body>
+
+  <div id="views">
+  
+  	<h1>Weather App</h1>
+  	<div id="weather">
+  	
+ 	  
+  	
+  	</div>
+  	
+  	
+    <div id="locations">
+      
+      <form>
+        <input type="text" placeholder="Enter a Zip Code">
+      </form>
+      
+      <div class="items"></div>
+    </div>
+    
+  </div>
+  <footer>
+	  
+  </footer>
+
+  <script src="js/lib/json2.js"></script>
+  <script src="js/lib/zepto/zepto.min.js"></script>
+  <!--<script src="js/lib/ICanHaz.min.js"></script>-->
+  <script src="js/lib/mustache.js"></script>
+  <script src="js/lib/store.min.js"></script>
+  <script src="js/lib/spine/spine.min.js"></script>
+  <script src="js/lib/spine/spine.model.local.js"></script>
+  <!--<script src="js/lib/spine/spine.model.ajax.js"></script>-->
+  <script src="js/lib/spine/spine.controller.manager.js"></script>
+  <script src="js/lib/spine/spine.route.js"></script>
+  <script src="js/models/location.js"></script>
+  <script src="js/application.js"></script>                
+
+</body>
+</html>
