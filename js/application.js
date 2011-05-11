@@ -1,44 +1,63 @@
-var exports = this;
+//var exports = this;
 
-  exports.WeatherView = Spine.Controller.create({
+$(document).ready(function () { 
+
+  window.WeatherView = Spine.Controller.create({
     
     proxied: ["render"],
-
-    template: function(item){
-      var template = $("#weatherTemplate").html();
-      return Mustache.to_html(template, item);
-    },
     
     init: function(){
       //this.item.bind("refresh",  this.render);
       //Location.bind("refresh",  this.render);
-      var selectedLoc = Location.first();
-      this.render(selectedLoc);
+      //this.render(selectedLoc);
+      //Location.bind("update", this.render);
+      Location.bind("refresh change", this.render);
     },
     
-    render: function(loc){
+    template: function(item){
+      var template = $("#weatherTemplate").html();
+      return Mustache.to_html(template, item);
+    },    
+    
+    render: function(){
+      if ( !this.item ) {
+      	this.item = Location.first();
+      	//var active = Location.active();
+      	//console.log(Location.current()[0]);
+      	//this.item = active[0];
+      }
       var self = this;
-	  $.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20location%3D"+loc.zip+"&format=json&diagnostics=true&callback=?", function(data){
-		  var channel = data.query.results.channel;
-		  //var condition = channel.item.condition;
-		  var item = channel.item;
+      var q = "select%20*%20from%20weather.forecast%20where%20location%3D"+this.item.zip;
+      $.yql(q, this.proxy(function(result){
+		  var channel = result.channel;
+		  var channelItem = channel.item;
 		  var weatherItem = {
-		  	temp: item.condition.text,
-		  	text: item.condition.temp,
-		  	description: item.description
+		  	temp: channelItem.condition.text,
+		  	text: channelItem.condition.temp,
+		  	description: channelItem.description,
+		  	city: channel.location.city,
+		  	country: channel.location.country,
+		  	region: channel.location.region
 		  };
 	      self.el.html(self.template(weatherItem));
-	      //self.el.html(weatherItem.description);
 	      return self;			
-	  });      
-      
-    }
+	  }));
+    },
+    change: function(item){
+      this.item = item;
+      //this.navigate("/weather", item.id);
+      //this.item.fetchStats();
+      this.render();
+      //this.active();
+    }    
+    
   });
 	  
-  exports.Locations = Spine.Controller.create({
+  window.Locations = Spine.Controller.create({
   	
     events: {
-      "click .destroy": "destroy"
+      "click .destroy": "destroy",
+      "click .location": "show"
     },
     
     proxied: ["render", "remove"],
@@ -67,10 +86,25 @@ var exports = this;
     destroy: function(e){
       e.preventDefault();
       this.item.destroy();
-    }
+    },
+    
+    show: function(e){
+      e.preventDefault();
+      this.navigate("/weather", this.item.id, true);
+	  //this.item.active = !this.item.active;
+	  /*
+      Location.each(function(rec){
+		rec.active = false;
+		rec.save();
+	  });
+	  */
+	  //this.item.active = true;
+      //this.item.save();
+      //console.log(this.item);
+    }    
   });
 
-  exports.LocationsList = Spine.Controller.create({
+  window.LocationsList = Spine.Controller.create({
     elements: {
       ".items": "items",
       "form":   "form",
@@ -102,20 +136,46 @@ var exports = this;
       //var value = this.input.val();
       var value = this.input.attr('value');
       
-      if ( value.length != 5 )
-      	throw "Zip required";
-      
-      if (value ){
-        Location.create({zip: value});
+      // TODO: Detect here whether the user is searching for a zip code or general place name (place name is assumed if zip criteria doesn not match)
+      if ( value ){
+      	  var found = false;
+	      var re = /^\d{5}$/;
+	      // Is this a zip code?
+	      if(re.test(value)){
+	      	
+			Location.each(function(rec){
+			  //console.log( rec.zip );
+			  if(rec.zip === value){
+			  	found = true;
+			  }
+			});	
+	      	if(!found){
+	        	Location.create({zip: value, active: false, current: false});
+	      	}      	
+	      	
+	      }else{
+	      	
+			Location.each(function(rec){
+			  if(rec.name.toLowerCase() === value.toLowerCase()){
+			  	found = true;
+			  }
+			});	
+	      	if(!found){
+	        	Location.create({name: value, active: false, current: false});
+	      	}	      	
+	      	
+	      }
       }
       
       //this.input.attr('value', "");
       this.form[0].reset();
-      this.input[0].focus();
+      this.input[0].focus();      
+
     }
+    
   });
   
-  exports.WeatherApp = Spine.Controller.create({
+  window.WeatherApp = Spine.Controller.create({
     el: $("body"),
     
     elements: {
@@ -124,10 +184,12 @@ var exports = this;
     },
     
     init: function(){
+      var self = this;
       this.list = LocationsList.init({el: this.locationsEl});
+      this.weather = WeatherView.init({el: this.weatherEl});
       
       this.manager = Spine.Controller.Manager.init();
-      this.manager.addAll(this.list);
+      this.manager.addAll(this.list, this.weather);
       
       /*
       this.routes({
@@ -135,12 +197,17 @@ var exports = this;
         "/list": function(){ this.list.active() }
       });
       */
+
+      this.routes({
+        "/weather/:id": function(id){ this.weather.change(Location.find(id)) }
+      });      
       
       Location.fetch();
-      //Spine.Route.setup();
+      Spine.Route.setup();
       
 	  if (navigator.geolocation) {
-		  navigator.geolocation.getCurrentPosition( 
+	  	
+		navigator.geolocation.getCurrentPosition( 
 		 
 			function (position) {  			
 				// console.log(position);
@@ -148,19 +215,18 @@ var exports = this;
 				// for (key in position.coords) {alert(key)}
 				
 				// Get zip code from Yahoo API based on the HTML5 Geolocation object's latitue and longitude 
-				$.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20geo.places%20where%20text%3D%22"+position.coords.latitude+"%2C%20"+position.coords.longitude+"%22&format=json&diagnostics=true&callback=?", function(data){
-					//console.log(data);
-					var geoZip = data.query.results.place[0].name;
-					var geoPlace = data.query.results.place[0].locality1.content;
-					var found = false;
-					Location.each(function(rec){
-					  //console.log( rec.zip );
-					  if(rec.zip === geoZip){
-					  	found = true;
-					  }
-					});
-					if(!found){
-						Location.create({name: 'Current Location ('+geoPlace+')', zip: geoZip, lat: position.coords.latitude, long: position.coords.longitude});
+				var q = "select%20*%20from%20geo.places%20where%20text%3D%22"+position.coords.latitude+"%2C%20"+position.coords.longitude+"%22";
+				$.yql(q, function(result){
+					//console.log(result);
+					var geoZip = result.place[0].postal.content;
+					var geoPlace = result.place[0].locality1.content + ", " + result.place[0].admin1.content;
+					var currentLoc = Location.current()[0];
+					if(currentLoc){
+						currentLoc = Location.find(currentLoc.id);
+						currentLoc.updateAttributes({name: 'Current Location ('+geoPlace+')', zip: geoZip, lat: position.coords.latitude, long: position.coords.longitude});
+					}else{
+						var loc = Location.create({name: 'Current Location ('+geoPlace+')', zip: geoZip, lat: position.coords.latitude, long: position.coords.longitude, active: true, current: true});
+						//self.weather.change(loc);
 					}
 				});
 		 
@@ -182,17 +248,16 @@ var exports = this;
 						break;
 				}
 			}
-			);
+		);
+	  }else{
+	  
+	  	//TODO: Geolocation disabled. Show message to alert user to add a location to their locations list.
+	  	
 	  }
 	  
-	  this.weather = WeatherView.init({el: this.weatherEl});	  
-	  //this.manager.render(this.weather);
-	  //this.weather.render();
       
     }
-  });
-
-
-$(document).ready(function () {   
-  exports.App = WeatherApp.init();
+  }).init();
+  
+  //exports.App = WeatherApp.init();
 });

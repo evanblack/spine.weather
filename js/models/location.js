@@ -1,29 +1,62 @@
-var Location = Spine.Model.setup("Location", ["name", "zip", "lat", "long"]);
+var Location = Spine.Model.setup("Location", ["name", "zip", "lat", "long", "active", "current"]);
 
 Location.extend(Spine.Model.Local);
 
+Location.extend({
+
+  active: function(){
+    return(this.select(function(item){ return !!item.active; }));
+  },
+  
+  current: function(){
+    return(this.select(function(item){ return !!item.current; }));
+  }  
+	
+});
+
 Location.include({
   validate: function(){
-    if ( !this.zip ){
-      return "zip required";
+    if ( !this.zip && !this.name ){
+      return "place or zip required";
     }
+    /*
     if ( this.zip.length != 5 ){
       return "zip must be 5 digits";
     }
-  },
+    */
+  }, 
   
   fetchData: function(){
-  	/*
-    if ( !this.short_url )
-      $.bitly(this.long_url, this.proxy(function(result){
-        this.updateAttributes({short_url: result});
-      }));
-    */
+  	var self = this;
+  	var searchStr;
+    if( this.zip ){
+      searchStr = this.zip;
+    }else{
+      searchStr = this.name;
+    }
+   	var q = "select%20*%20from%20geo.placefinder%20where%20text%3D%22"+searchStr+"%22";
+   	$.yql(q, this.proxy(function(result){
+		//console.log(result);
+		/*
+		var geoZip = result.place[0].name;
+		var geoPlace = result.place[0].locality1.content;
+		var geoLat = result.place[0].centroid.latitude;
+		var geoLong = result.place[0].centroid.longitude;
+		*/
+		result = result.Result;
+		var geoZip = result.uzip;
+		var geoPlace = result.city + ", " + result.statecode;
+		var geoLat = result.latitude;
+		var geoLong = result.longitude;			
+		self.updateAttributes({name: geoPlace, zip: geoZip, lat: geoLat, long: geoLong});    		
+   	}));
   }
 });
 
 Location.bind("create", function(rec){
-  rec.fetchData();
+  if(!rec.current){
+  	rec.fetchData();
+  }
 });
 
 Location.bind("error", function(rec, msg){

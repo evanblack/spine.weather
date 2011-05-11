@@ -16,11 +16,12 @@
 	
   <script id="locationTemplate" type="text/html">
     <div class="item">
-    	{{ zip }} (<a href="#" class="destroy">x</a>)
+    	<a href="#" class="location">{{ name }}</a> - {{ zip }} (<a href="#" class="destroy">x</a>)
     </div>
   </script>
   
   <script id="weatherTemplate" type="text/html">
+  	<h2>{{ city }}, {{ region }}</h2>
     {{ temp }} - {{ text }}
     <p>{{{ description }}}</p>
   </script>	  
@@ -34,7 +35,7 @@
   	<h1>Weather App</h1>
   	<div id="weather">
   	
- 	  
+ 	  Loading Weather...
   	
   	</div>
   	
@@ -42,7 +43,7 @@
     <div id="locations">
       
       <form>
-        <input type="text" placeholder="Enter a Zip Code">
+        <input type="text" placeholder="Enter a Zip Code or City">
       </form>
       
       <div class="items"></div>
@@ -55,6 +56,7 @@
 
   <script src="js/lib/json2.js"></script>
   <script src="js/lib/zepto/zepto.min.js"></script>
+  <script src="js/plugins/yql.js"></script>
   <!--<script src="js/lib/ICanHaz.min.js"></script>-->
   <script src="js/lib/mustache.js"></script>
   <script src="js/lib/store.min.js"></script>
