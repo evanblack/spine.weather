@@ -222,7 +222,7 @@ $(document).ready(function () {
 					var geoPlace = result.place[0].locality1.content + ", " + result.place[0].admin1.content;
 					var currentLoc = Location.current()[0];
 					if(currentLoc){
-						currentLoc = Location.find(currentLoc.id);
+						//currentLoc = Location.find(currentLoc.id);
 						currentLoc.updateAttributes({name: 'Current Location ('+geoPlace+')', zip: geoZip, lat: position.coords.latitude, long: position.coords.longitude});
 					}else{
 						var loc = Location.create({name: 'Current Location ('+geoPlace+')', zip: geoZip, lat: position.coords.latitude, long: position.coords.longitude, active: true, current: true});
