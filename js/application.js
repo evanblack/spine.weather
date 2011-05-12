@@ -40,6 +40,17 @@ $(document).ready(function () {
 		  	region: channel.location.region
 		  };
 	      self.el.html(self.template(weatherItem));
+	      
+	      // Set up weather radar view
+	      var mapEl = document.createElement('DIV');
+	      mapEl.id = "radarmap";
+	  	  mapEl.style.width = '300px';
+		  mapEl.style.height = '300px';	      
+	      self.el.append( mapEl );
+	      $.radar(self.item.lat, self.item.long, function(){
+	      	console.log("radar loaded!");
+	      });
+	      
 	      return self;			
 	  }));
     },
