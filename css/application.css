@@ -248,7 +248,11 @@ a.blue:active {
 	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#0078a5', endColorstr='#00adee');
 }
 
-
+#views{
+	width:320px;
+	height:430px;
+	overflow:hidden;	
+}
 
 #views .panel:not(.active) {
   display: none !important;
