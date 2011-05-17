@@ -3,6 +3,10 @@
 $(document).ready(function () { 
 
   window.WeatherView = Spine.Controller.create({
+  	
+    events: {
+      "click .radar a": "showRadar",
+    },  	
     
     proxied: ["render"],
     
@@ -32,21 +36,40 @@ $(document).ready(function () {
 		  var channel = result.channel;
 		  var channelItem = channel.item;
 		  var weatherItem = {
-		  	temp: channelItem.condition.text,
-		  	text: channelItem.condition.temp,
-		  	description: channelItem.description,
 		  	city: channel.location.city,
 		  	country: channel.location.country,
-		  	region: channel.location.region
+		  	region: channel.location.region,
+		  	conditionText: channelItem.condition.text,
+		  	conditionCode: channelItem.condition.code,
+		  	temp: channelItem.condition.temp,
+		  	description: channelItem.description,		  	
+		  	sunrise: channel.astronomy.sunrise,
+		  	sunset: channel.astronomy.sunset,
+		  	windDirection: channel.wind.direction,
+		  	windSpeed: channel.wind.speed,
+		  	windChill: channel.wind.chill,
+		  	distanceUnit: channel.units.distance,
+		  	pressureUnit: channel.units.pressure,
+		  	speedUnit: channel.units.speed,
+		  	tempUnit: channel.units.temperature,
+		  	forecast1Code: channelItem.forecast[0].code,
+		  	forecast1Day: channelItem.forecast[0].day,
+		  	forecast1High: channelItem.forecast[0].high,
+		  	forecast1Low: channelItem.forecast[0].low,
+		  	forecast1Text: channelItem.forecast[0].text,
+		  	forecast2Code: channelItem.forecast[1].code,
+		  	forecast2Day: channelItem.forecast[1].day,
+		  	forecast2High: channelItem.forecast[1].high,
+		  	forecast2Low: channelItem.forecast[1].low,
+		  	forecast2Text: channelItem.forecast[1].text		  	
 		  };
 	      self.el.html(self.template(weatherItem));
 	      
 	      // Set up weather radar view
+	      $('#radarmap').remove();
 	      var mapEl = document.createElement('DIV');
 	      mapEl.id = "radarmap";
-	  	  mapEl.style.width = '300px';
-		  mapEl.style.height = '300px';	      
-	      self.el.append( mapEl );
+	      $('#radar').append( mapEl );
 	      $.radar(self.item.lat, self.item.long, function(){
 	      	console.log("radar loaded!");
 	      });
@@ -60,7 +83,13 @@ $(document).ready(function () {
       //this.item.fetchStats();
       this.render();
       //this.active();
-    }    
+    },
+    showRadar: function(e){
+      e.preventDefault();
+	  //console.log(e);
+	  $('#weather').hide();
+	  $('#radar').addClass('active');
+    }       
     
   });
 	  
@@ -199,19 +228,26 @@ $(document).ready(function () {
       this.list = LocationsList.init({el: this.locationsEl});
       this.weather = WeatherView.init({el: this.weatherEl});
       
-      this.manager = Spine.Controller.Manager.init();
-      this.manager.addAll(this.list, this.weather);
+      this.manager = Spine.Manager.init(this.list, this.weather);
+      //this.manager = Spine.Manager.init();
+      //this.manager.add(this.list, this.weather);
       
-      /*
-      this.routes({
-        "": function(){ this.list.active() },
-        "/list": function(){ this.list.active() }
-      });
-      */
+      this.tabs = Spine.Tabs.init({el: $("nav .tabs")});
+      this.tabs.connect("weather", this.weather);
+      this.tabs.connect("locations", this.list);
+      this.tabs.render();
 
       this.routes({
-        "/weather/:id": function(id){ this.weather.change(Location.find(id)) }
-      });      
+      	"/locations": function(){ this.list.active();this.tabs.change("locations");$('#radar').removeClass('active');$('#weather').show(); },
+      	"/weather": function(){ this.weather.active();this.tabs.change("weather"); },
+        "/weather/:id": function(id){ this.weather.change(Location.find(id));this.weather.active();this.tabs.change("weather"); }
+      });
+      
+      $('#radar .back').bind('click', function(e){
+      	e.preventDefault();
+      	$('#radar').removeClass('active');
+      	$('#weather').show();
+      });
       
       Location.fetch();
       Spine.Route.setup();
@@ -230,13 +266,14 @@ $(document).ready(function () {
 				$.yql(q, function(result){
 					//console.log(result);
 					var geoZip = result.place[0].postal.content;
-					var geoPlace = result.place[0].locality1.content + ", " + result.place[0].admin1.content;
+					var stateCode = result.place[0].admin1.code;
+					var geoPlace = result.place[0].locality1.content + ", " + stateCode.replace("US-", "");
 					var currentLoc = Location.current()[0];
 					if(currentLoc){
 						//currentLoc = Location.find(currentLoc.id);
-						currentLoc.updateAttributes({name: 'Current Location ('+geoPlace+')', zip: geoZip, lat: position.coords.latitude, long: position.coords.longitude});
+						currentLoc.updateAttributes({name: 'My Location ('+geoPlace+')', zip: geoZip, lat: position.coords.latitude, long: position.coords.longitude});
 					}else{
-						var loc = Location.create({name: 'Current Location ('+geoPlace+')', zip: geoZip, lat: position.coords.latitude, long: position.coords.longitude, active: true, current: true});
+						var loc = Location.create({name: 'My Location ('+geoPlace+')', zip: geoZip, lat: position.coords.latitude, long: position.coords.longitude, active: true, current: true});
 						//self.weather.change(loc);
 					}
 				});

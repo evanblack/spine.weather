@@ -7,9 +7,9 @@
     Spine = this.Spine = {};
   }
   
-  Spine.version = "0.0.3";
+  Spine.version = "0.0.4";
   
-  var $ = Spine.$ = this.jQuery || this.Zepto;
+  var $ = Spine.$ = this.jQuery || this.Zepto || function(){ return arguments[0]; };
   
   var makeArray = Spine.makeArray = function(args){
     return Array.prototype.slice.call(args, 0);
@@ -106,7 +106,7 @@
     created: function(){},
     
     prototype: {
-      initializer: function(){},
+      initialize: function(){},
       init: function(){}
     },
 
@@ -124,12 +124,12 @@
     },
 
     init: function(){
-      var initance = Object.create(this.prototype);
-      initance.parent = this;
+      var instance = Object.create(this.prototype);
+      instance.parent = this;
 
-      initance.initializer.apply(initance, arguments);
-      initance.init.apply(initance, arguments);
-      return initance;
+      instance.initialize.apply(instance, arguments);
+      instance.init.apply(instance, arguments);
+      return instance;
     },
 
     proxy: function(func){
@@ -194,17 +194,8 @@
     
     created: function(sub){
       this.records = {};
-      this.attributes = [];
-
-      this.bind("create",  this.proxy(function(record){ 
-        this.trigger("change", "create", record);
-      }));
-      this.bind("update",  this.proxy(function(record){ 
-        this.trigger("change", "update", record);
-      }));
-      this.bind("destroy", this.proxy(function(record){ 
-        this.trigger("change", "destroy", record);
-      }));
+      this.attributes = this.attributes ? 
+        makeArray(this.attributes) : [];
     },
 
     find: function(id){
@@ -222,15 +213,17 @@
     },
 
     refresh: function(values){
+      values = this.fromJSON(values);
       this.records = {};
 
       for (var i=0, il = values.length; i < il; i++) {    
-        var record = this.init(values[i]);
+        var record = values[i];
         record.newRecord = false;
         this.records[record.id] = record;
       }
 
       this.trigger("refresh");
+      return this;
     },
 
     select: function(callback){
@@ -295,8 +288,7 @@
 
     create: function(atts){
       var record = this.init(atts);
-      record.save();
-      return record;
+      return record.save();
     },
 
     destroy: function(id){
@@ -316,15 +308,17 @@
     },
     
     fromJSON: function(objects){
-      var self = this;
+      if ( !objects ) return;
       if (typeof objects == "string")
         objects = JSON.parse(objects)
-      if (typeof objects == "array")
-        return($.map(objects, function(){
-          return self.init(this);
-        }));
-      else
-       return this.init(objects);
+      if (typeof objects.length == "number") {
+        var results = [];
+        for (var i=0; i < objects.length; i++)
+          results.push(this.init(objects[i]));
+        return results;
+      } else {
+        return this.init(objects);
+      }
     },
 
     // Private
@@ -339,7 +333,7 @@
     cloneArray: function(array){
       var result = [];
       for (var i=0; i < array.length; i++)
-        result.push(array[i].dup());
+        result.push(array[i].clone());
       return result;
     }
   });
@@ -350,10 +344,15 @@
 
     init: function(atts){
       if (atts) this.load(atts);
+      this.trigger("init", this);
     },
 
     isNew: function(){
       return this.newRecord;
+    },
+    
+    isValid: function(){
+      return(!this.validate());
     },
 
     validate: function(){ },
@@ -380,9 +379,9 @@
 
     save: function(){
       var error = this.validate();
-      if (error) {
-        if ( !this.trigger("error", this, error) )
-          throw("Validation failed: " + error);
+      if ( error ) {
+        this.trigger("error", this, error)
+        return false;
       }
       
       this.trigger("beforeSave", this);
@@ -400,11 +399,13 @@
       this.load(atts);
       return this.save();
     },
-
+    
     destroy: function(){
       this.trigger("beforeDestroy", this);
       delete this.parent.records[this.id];
+      this.destroyed = true;
       this.trigger("destroy", this);
+      this.trigger("change", this, "destroy");
     },
 
     dup: function(){
@@ -438,7 +439,9 @@
       this.trigger("beforeUpdate", this);
       var records = this.parent.records;
       records[this.id].load(this.attributes());
-      this.trigger("update", records[this.id].clone());
+      var clone = records[this.id].clone();
+      this.trigger("update", clone);
+      this.trigger("change", clone, "update");
     },
 
     create: function(){
@@ -447,7 +450,9 @@
       this.newRecord   = false;
       var records      = this.parent.records;
       records[this.id] = this.dup();
-      this.trigger("create", records[this.id].clone());
+      var clone        = records[this.id].clone();
+      this.trigger("create", clone);
+      this.trigger("change", clone, "create");
     },
     
     bind: function(events, callback){
@@ -469,7 +474,7 @@
   var Controller = Spine.Controller = Class.create({
     tag: "div",
     
-    initializer: function(options){
+    initialize: function(options){
       this.options = options;
 
       for (var key in this.options)

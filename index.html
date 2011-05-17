@@ -7,40 +7,109 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="shortcut icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  <!--iOS web app, deletable if not needed -->
+  <!--<meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-startup-image" href="img/l/splash.png">-->  
 
   <link rel="stylesheet" href="css/application.css">
 	
-  <script id="locationTemplate" type="text/html">
-    <div class="item">
-    	<a href="#" class="location">{{ name }}</a> - {{ zip }} (<a href="#" class="destroy">x</a>)
-    </div>
-  </script>
   
   <script id="weatherTemplate" type="text/html">
-  	<h2>{{ city }}, {{ region }}</h2>
-    {{ temp }} - {{ text }}
-    <p>{{{ description }}}</p>
-  </script>	  
+  	<header>{{ city }}, {{ region }}</header>
+  	<div class="current-conditions clearfix">
+  		<div class="condition-icon column">
+  			<img src="img/weather-icons/iconbest/{{ conditionCode }}.png" alt="{{ conditionText }}" />
+  		</div>
+  		<div class="condition-text column">
+  			<span class="current-temp">{{ temp }}&deg;</span>
+  			<span class="conditions">{{ conditionText }}</span>
+  		</div>  		
+  	</div>
+  	<div class="meta clearfix">
+  		<div class="column">
+  			<div class="radar">
+  				<a href="#" class="button green"><span>Radar</span></a>
+  			</div>
+  			<div class="wind">
+  				<span class="direction"><img src="img/arrow.png" alt="{{ windDirection }}" style="-moz-transform:rotate({{ windDirection }}deg);-webkit-transform:rotate({{ windDirection }}deg);transform:rotate({{ windDirection }}deg);" /></span>
+  				<span class="speed">{{ windSpeed }} {{ speedUnit }}</span>
+  			</div>
+  		</div>
+  		<div class="column">
+  			<div class="day-highlow clearfix">
+  				<span class="column high">{{ forecast1High }}&deg;</span>
+  				<span class="column low">{{ forecast1Low }}&deg;</span>
+  			</div>
+  			<div class="astronomy">
+  				<span>{{ sunrise }} - {{ sunset }}</span>
+  			</div>
+  		</div>  		
+  	</div>
+  	<div class="forecast clearfix">
+  		<ul>
+  			<li>
+  				<div class="day">
+  					<span>{{ forecast1Day }}</span>
+  					<span class="condition">{{ forecast1Text }}</span>
+  				</div>
+  				<div class="icon">
+  					<img src="img/weather-icons/iconbest/{{ forecast1Code }}.png" width="40" alt="{{ forecast1Text }}" />
+  				</div>
+  				<div class="temps">
+  					<span>{{ forecast1High }}&deg;/{{ forecast1Low }}&deg;</span>
+  				</div>
+  			</li>
+  			<li>
+  				<div class="day">
+  					<span>{{ forecast2Day }}</span>
+  					<span class="condition">{{ forecast2Text }}</span>
+  				</div>
+  				<div class="icon">
+  					<img src="img/weather-icons/iconbest/{{ forecast2Code }}.png" width="40" alt="{{ forecast2Text }}" />
+  				</div>
+  				<div class="temps">
+  					<span>{{ forecast2High }}&deg;/{{ forecast2Low }}&deg;</span>
+  				</div>  			
+  			</li>  			
+  		</ul>
+  	</div>
+  </script>	
+  
+  <script id="locationTemplate" type="text/html">
+    <div class="item">
+    	<div class="location">
+    		{{ name }}
+    		<span class="zip">{{ zip }} 
+    	</div>
+    	<a href="#" class="destroy">x</a>
+    </div>
+  </script>    
 
 </head>
 
 <body>
 
-  <div id="views">
+  <div id="views" class="clearfix">
   
-  	<h1>Weather App</h1>
-  	<div id="weather">
+  	<div id="weather" class="panel">
   	
  	  Loading Weather...
   	
+  	</div>	
+  	
+  	<div id="radar">
+  		<header>Weather Radar<a href="#" class="button blue back">Back</a></header>
   	</div>
   	
-  	
-    <div id="locations">
+    <div id="locations" class="panel">
       
       <form>
         <input type="text" placeholder="Enter a Zip Code or City">
@@ -51,7 +120,12 @@
     
   </div>
   <footer>
-	  
+	  <nav>
+	  	<ul class="tabs">
+	  		<li data-name="weather"><span>Weather</span></li>
+	  		<li data-name="locations"><span>Locations</span></li>
+	  	</ul>
+	  </nav>
   </footer>
 
   <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
@@ -65,7 +139,8 @@
   <script src="js/lib/spine/spine.min.js"></script>
   <script src="js/lib/spine/spine.model.local.js"></script>
   <!--<script src="js/lib/spine/spine.model.ajax.js"></script>-->
-  <script src="js/lib/spine/spine.controller.manager.js"></script>
+  <script src="js/lib/spine/spine.manager.js"></script>
+  <script src="js/lib/spine/spine.tabs.js"></script>
   <script src="js/lib/spine/spine.route.js"></script>
   <script src="js/models/location.js"></script>
   <script src="js/application.js"></script>                
