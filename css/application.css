@@ -561,6 +561,7 @@ footer nav li.active{
 footer nav li span{
 	display:block;
 	padding:10px 0;
+	cursor:pointer;
 }
 
 footer nav li.active span{
