@@ -6,7 +6,7 @@ window.addEventListener("load",function() {
   setTimeout(function(){
     // Hide the address bar!
     window.scrollTo(0, 1);
-  }, 10);
+  }, 1000);
 }, false);
 
 $(document).ready(function () { 
@@ -25,8 +25,8 @@ $(document).ready(function () {
       //Location.bind("refresh",  this.render);
       //this.render(selectedLoc);
       //Location.bind("update", this.render);
+      //Location.bind("change", this.render);
       Location.bind("change", this.render);
-      //Location.bind("refresh change", this.render);
     },
     
     template: function(item){
@@ -244,6 +244,7 @@ $(document).ready(function () {
       this.weather = WeatherView.init({el: this.weatherEl});
       
       this.manager = Spine.Manager.init(this.list, this.weather);
+      this.weather.active();
       //this.manager = Spine.Manager.init();
       //this.manager.add(this.list, this.weather);
       

@@ -20,10 +20,12 @@
 (function(Spine, $){
 	
   if(UTIL.isTouchDevice()){
+  	  var tabEvent = "touchstart";
 	  var tabsEvents = {
 	    "touchstart [data-name]": "click"
 	  };
   }else{
+  	  var tabEvent = "click";
 	  var tabsEvents = {
 	    "click [data-name]": "click"  	
 	  };  	
@@ -49,7 +51,7 @@
     render: function(){
       this.change(this.current);
       if ( !this.children(".active").length || !this.current )
-        $(this.children()[0]).trigger('click');
+        $(this.children()[0]).trigger(tabEvent);
     },
     
     children: function(sel){

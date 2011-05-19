@@ -4,7 +4,7 @@
   <meta charset="utf-8">
 
   <title>Poncho</title>
-  <meta name="description" content="">
+  <meta name="description" content="Your weather. Simplified.">
   <meta name="author" content="">
 
   <meta name="HandheldFriendly" content="True">
@@ -139,17 +139,27 @@
   <script src="js/lib/zepto/zepto.min.js"></script>
   <script src="js/plugins/yql.js"></script>
   <script src="js/plugins/weatherradar.js"></script>
-  <!--<script src="js/lib/ICanHaz.min.js"></script>-->
   <script src="js/lib/mustache.js"></script>
   <script src="js/lib/store.min.js"></script>
   <script src="js/lib/spine/spine.min.js"></script>
   <script src="js/lib/spine/spine.model.local.js"></script>
-  <!--<script src="js/lib/spine/spine.model.ajax.js"></script>-->
   <script src="js/lib/spine/spine.manager.js"></script>
   <script src="js/lib/spine/spine.tabs.js"></script>
   <script src="js/lib/spine/spine.route.js"></script>
   <script src="js/models/location.js"></script>
-  <script src="js/application.js"></script>                
+  <script src="js/application.js"></script>  
+  
+  <script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-23462110-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+  </script>               
 
 </body>
 </html>
