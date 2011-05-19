@@ -6,15 +6,16 @@ window.addEventListener("load",function() {
   setTimeout(function(){
     // Hide the address bar!
     window.scrollTo(0, 1);
-  }, 0);
-});
+  }, 10);
+}, false);
 
 $(document).ready(function () { 
 
   window.WeatherView = Spine.Controller.create({
   	
     events: {
-      "click .radar a": "showRadar",
+      "touchstart .radar a": "showRadar",
+      "click .radar a": "showRadar"
     },  	
     
     proxied: ["render"],
@@ -24,7 +25,8 @@ $(document).ready(function () {
       //Location.bind("refresh",  this.render);
       //this.render(selectedLoc);
       //Location.bind("update", this.render);
-      Location.bind("refresh change", this.render);
+      Location.bind("change", this.render);
+      //Location.bind("refresh change", this.render);
     },
     
     template: function(item){
@@ -44,10 +46,13 @@ $(document).ready(function () {
       $.yql(q, this.proxy(function(result){
 		  var channel = result.channel;
 		  var channelItem = channel.item;
+		  var pubDate = channelItem.pubDate.split(" ");
 		  var weatherItem = {
 		  	city: channel.location.city,
 		  	country: channel.location.country,
 		  	region: channel.location.region,
+		  	time: pubDate[4],
+		  	meridiem: pubDate[5],
 		  	conditionText: channelItem.condition.text,
 		  	conditionCode: channelItem.condition.code,
 		  	temp: channelItem.condition.temp,
@@ -106,6 +111,7 @@ $(document).ready(function () {
   	
     events: {
       "click .destroy": "destroy",
+      "touchstart .location": "show",
       "click .location": "show"
     },
     
@@ -252,7 +258,7 @@ $(document).ready(function () {
         "/weather/:id": function(id){ this.weather.change(Location.find(id));this.weather.active();this.tabs.change("weather"); }
       });
       
-      $('#radar .back').bind('click', function(e){
+      $('#radar .back').bind('touchstart click', function(e){
       	e.preventDefault();
       	$('#radar').removeClass('active');
       	$('#weather').show();

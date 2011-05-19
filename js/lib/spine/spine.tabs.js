@@ -18,11 +18,19 @@
 // tabs.render();
 
 (function(Spine, $){
+	
+  if(UTIL.isTouchDevice()){
+	  var tabsEvents = {
+	    "touchstart [data-name]": "click"
+	  };
+  }else{
+	  var tabsEvents = {
+	    "click [data-name]": "click"  	
+	  };  	
+  }
   
   Spine.Tabs = Spine.Controller.create({
-    events: {
-      "click [data-name]": "click"
-    },
+    events: tabsEvents,
     
     proxied: ["change"],
     

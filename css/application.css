@@ -184,6 +184,14 @@ textarea.contenteditable {-webkit-appearance: none;}
    Author: Evan Black
 */
 
+#radar a:active, #radar a:focus,
+a.back:active, #radar a.back:focus,
+#locations input:active, #locations input:focus{
+	outline: none;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	-webkit-focus-ring-color:  rgba(0, 0, 0, 0);	
+}
+
 a.button {
 	display: inline-block;
 	vertical-align: baseline;
@@ -192,7 +200,7 @@ a.button {
 	text-align: left;
 	text-decoration: none;
 	font: bold 16px/100% sans-serif;
-	padding: 10px 18px 10px 12px;
+	padding: 11px 18px 9px 12px;
 	text-shadow: 0 1px 1px rgba(0,0,0,.6);
 	-webkit-border-radius: 8px; 
 	-moz-border-radius: 8px;
@@ -200,6 +208,7 @@ a.button {
 	-webkit-box-shadow: 0 2px 4px rgba(0,0,0,.3);
 	-moz-box-shadow: 0 2px 4px rgba(0,0,0,.3);
 	box-shadow: 0 2px 4px rgba(0,0,0,.3);
+	-webkit-background-clip: padding-box;
 }
 a.button:hover {
 	text-decoration: none;
@@ -248,6 +257,70 @@ a.blue:active {
 	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#0078a5', endColorstr='#00adee');
 }
 
+
+.loading{
+	font-size:24px;
+	font-weight:bold;
+	text-align:center;	
+	margin: 12px auto 0;
+	text-shadow: 0px 1px 2px #000;
+}
+
+.loading span{
+	display:block;
+	margin-bottom:6px;
+}
+
+.loader-dot {
+    display:inline-block;
+    width:16px;
+    height:16px;
+    background-color:#999;
+    -webkit-border-radius: 16px;
+    margin-right:10px;
+}
+
+.loader-dot {
+  -webkit-animation-duration:1.2s;
+  -webkit-animation-iteration-count:infinite;
+  -webkit-animation-timing-function:linear;
+}
+ 
+.loader-dot.first {
+    -webkit-animation-name: transformShapeFirst;
+}
+.loader-dot.second {
+    -webkit-animation-name: transformShapeSecond;
+}
+.loader-dot.third {
+    -webkit-animation-name: transformShapeThird;
+}
+
+@-webkit-keyframes transformShapeFirst {
+  0% {-webkit-transform:scale(1.0);}
+  25% {-webkit-transform:scale(0.75);}
+  50% {-webkit-transform:scale(0.5);}
+  75% {-webkit-transform:scale(0.75);}
+  100% {-webkit-transform:scale(1.0);}
+}
+ 
+@-webkit-keyframes transformShapeSecond {
+  0% {-webkit-transform:scale(0.75);}
+  25% {-webkit-transform:scale(1.0);}
+  50% {-webkit-transform:scale(0.75);}
+  75% {-webkit-transform:scale(0.5);}
+  100% {-webkit-transform:scale(0.75);}
+}
+ 
+@-webkit-keyframes transformShapeThird {
+  0% {-webkit-transform:scale(0.5);}
+  25% {-webkit-transform:scale(0.75);}
+  50% {-webkit-transform:scale(1.0);}
+  75% {-webkit-transform:scale(0.75);}
+  100% {-webkit-transform:scale(0.5);}
+}
+
+
 body, #views{
 	width:320px;
 	height:430px;
@@ -275,6 +348,22 @@ header{
 	padding:8px 10px;
 	color:#ccc;
 	height:30px;
+	text-shadow: 0px 1px 2px #000;
+}
+
+#weather header div{
+	display:inline-block;
+	float:right;
+	color:#777777;
+	font-size:16px;
+	font-weight:bold;
+	line-height:30px;
+}
+
+#weather header span{
+	font-size:12px;
+	text-transform:uppercase;
+	margin-left:4px;
 }
 
 #weather .current-conditions{
@@ -282,7 +371,7 @@ header{
 }
 
 #weather .meta{
-	padding:0 10px 12px;
+	padding:0 10px 6px;
 }
 
 #weather .column{
@@ -305,6 +394,7 @@ header{
 	text-align:left;
 	color:#eee;
 	padding:0 0 0 10px;
+	/*text-shadow: 0px 1px 2px #000;*/
 }
 
 #weather .conditions{
@@ -326,7 +416,7 @@ header{
 
 #weather .radar .button span{
 	display:inline-block;
-	padding:10px 0 10px 36px;
+	padding:11px 0 9px 36px;
 	background:transparent url(../img/sprite.png) no-repeat 0 -57px;	
 }
 
@@ -444,13 +534,15 @@ header{
 }
 
 #locations input{
+	font-size: 16px;
 	border:0;
 	outline:none;
-	padding: 6px 0 6px 8px;
+	padding: 10px 0 10px 8px;
 	-webkit-border-radius: 12px; 
 	-moz-border-radius: 12px;
 	border-radius: 12px;
 	width:90%;	
+	-webkit-background-clip: padding-box;
 }
 
 #locations .items{
@@ -469,14 +561,15 @@ header{
 }
 
 #locations .item .location{
-	font-size: 14px;
+	font-size: 15px;
 	font-weight:bold;
-	padding: 6px 38px 6px 10px;
+	/*line-height:1.4;*/
+	padding: 10px 38px 10px 10px;
 }
 
 #locations .item span{
 	display:block;	
-	font-size: 12px;
+	font-size: 13px;
 	font-weight:normal;
 	color:#666;
 }
@@ -513,13 +606,15 @@ header{
 
 #radar header{
 	font-size:20px;
-	text-align:center;	
+	text-align:center;
+	line-height:30px;
+	padding:10px 10px;
 }
 
 #radar header .back{
 	position:absolute;
-	top:4px;left:10px;
-	padding: 8px 10px;	
+	top:7px;left:10px;
+	padding: 9px 10px 7px;	
 }
 
 #radar #radarmap{
@@ -573,6 +668,7 @@ footer nav li.active span{
 	-moz-border-radius-bottomright: 12px;
 	border-bottom-left-radius: 12px;	
 	border-bottom-right-radius: 12px;
+	-webkit-background-clip: padding-box;
 	/*
 	-webkit-box-shadow: 0 2px 4px rgba(0,0,0,.5);
 	-moz-box-shadow: 0 2px 4px rgba(0,0,0,.5);

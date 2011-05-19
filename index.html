@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
 
-  <title>My Weather App</title>
+  <title>Poncho</title>
   <meta name="description" content="">
   <meta name="author" content="">
 
   <meta name="HandheldFriendly" content="True">
   <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=n">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
   <link rel="shortcut icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -23,7 +23,7 @@
 	
   
   <script id="weatherTemplate" type="text/html">
-  	<header>{{ city }}, {{ region }}</header>
+  	<header>{{ city }}, {{ region }} <div>{{ time }}<span>{{ meridiem }}<span></div></header>
   	<div class="current-conditions clearfix">
   		<div class="condition-icon column">
   			<img src="img/weather-icons/iconbest/{{ conditionCode }}.png" alt="{{ conditionText }}" />
@@ -100,8 +100,13 @@
   <div id="views" class="clearfix">
   
   	<div id="weather" class="panel">
-  	
- 	  Loading Weather...
+
+		<div class="loading">  	
+			<span>Loading Weather&hellip;</span>
+			<div class="loader-dot first"></div>
+			<div class="loader-dot second"></div>
+			<div class="loader-dot third"></div> 	  
+		</div>  	
   	
   	</div>	
   	
@@ -129,6 +134,7 @@
   </footer>
 
   <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+  <script src="js/util.js"></script>
   <script src="js/lib/json2.js"></script>
   <script src="js/lib/zepto/zepto.min.js"></script>
   <script src="js/plugins/yql.js"></script>
