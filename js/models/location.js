@@ -37,12 +37,6 @@ Location.include({
    	var q = "select%20*%20from%20geo.placefinder%20where%20text%3D%22"+searchStr+"%22";
    	$.yql(q, this.proxy(function(result){
 		//console.log(result);
-		/*
-		var geoZip = result.place[0].name;
-		var geoPlace = result.place[0].locality1.content;
-		var geoLat = result.place[0].centroid.latitude;
-		var geoLong = result.place[0].centroid.longitude;
-		*/
 		result = result.Result;
 		var geoZip = result.uzip;
 		var geoPlace = result.city + ", " + result.statecode;

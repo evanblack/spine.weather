@@ -6,7 +6,7 @@ window.addEventListener("load",function() {
   setTimeout(function(){
     // Hide the address bar!
     window.scrollTo(0, 1);
-  }, 1000);
+  }, 10);
 }, false);
 
 $(document).ready(function () { 
@@ -25,7 +25,7 @@ $(document).ready(function () {
       //Location.bind("refresh",  this.render);
       //this.render(selectedLoc);
       //Location.bind("update", this.render);
-      //Location.bind("change", this.render);
+      //Location.bind("refresh change", this.render);
       Location.bind("change", this.render);
     },
     
@@ -281,16 +281,19 @@ $(document).ready(function () {
 				var q = "select%20*%20from%20geo.places%20where%20text%3D%22"+position.coords.latitude+"%2C%20"+position.coords.longitude+"%22";
 				$.yql(q, function(result){
 					//console.log(result);
-					var geoZip = result.place[0].postal.content;
-					var stateCode = result.place[0].admin1.code;
-					var geoPlace = result.place[0].locality1.content + ", " + stateCode.replace("US-", "");
-					var currentLoc = Location.current()[0];
-					if(currentLoc){
-						//currentLoc = Location.find(currentLoc.id);
-						currentLoc.updateAttributes({name: 'My Location ('+geoPlace+')', zip: geoZip, lat: position.coords.latitude, long: position.coords.longitude});
-					}else{
-						var loc = Location.create({name: 'My Location ('+geoPlace+')', zip: geoZip, lat: position.coords.latitude, long: position.coords.longitude, active: true, current: true});
-						//self.weather.change(loc);
+					// TO DO: Sometimes the YQL query returns null on certain page loads 
+					if(result){
+						var geoZip = result.place[0].postal.content;
+						var stateCode = result.place[0].admin1.code;
+						var geoPlace = result.place[0].locality1.content + ", " + stateCode.replace("US-", "");
+						var currentLoc = Location.current()[0];
+						if(currentLoc){
+							//currentLoc = Location.find(currentLoc.id);
+							currentLoc.updateAttributes({name: 'My Location ('+geoPlace+')', zip: geoZip, lat: position.coords.latitude, long: position.coords.longitude});
+						}else{
+							var loc = Location.create({name: 'My Location ('+geoPlace+')', zip: geoZip, lat: position.coords.latitude, long: position.coords.longitude, active: true, current: true});
+							//self.weather.change(loc);
+						}
 					}
 				});
 		 

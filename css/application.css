@@ -184,12 +184,17 @@ textarea.contenteditable {-webkit-appearance: none;}
    Author: Evan Black
 */
 
-#radar a:active, #radar a:focus,
-a.back:active, #radar a.back:focus,
-#locations input:active, #locations input:focus{
-	outline: none;
-	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-	-webkit-focus-ring-color:  rgba(0, 0, 0, 0);	
+/* Remove ugly webkit highlighting */
+#radar a.back,
+.radar a,
+#locations input,
+.tabs li,
+.tabs li a{
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	-webkit-appearance: none;
+	-webkit-focus-ring-color:  rgba(0, 0, 0, 0);
+	resize: none;
+	outline: none;	
 }
 
 a.button {
