@@ -24,7 +24,7 @@
       center: myLatLng,
       mapTypeId: google.maps.MapTypeId.ROADMAP,
       mapTypeControl: false,
-      draggable: false,
+      draggable: true,
       streetViewControl: false,
       scrollwheel: false
     };
@@ -45,11 +45,12 @@
 		  overlay.setMap(null);
 		  
 		  bounds = this.getBounds();
+		  var newCenter = this.getCenter();
 		  params.zoomLevel = this.getZoom();
 		  
 		  var newZoom = radarZoomLevels[params.zoomLevel];
 		  
-		  var srcImage = 'http://resize.wunderground.com/cgi-bin/resize_convert?ox=gif&url=radblast/cgi-bin/radar/WUNIDS_composite%3Fcenterlat='+params.lat+'%26centerlon='+params.long+'%26radius='+newZoom+'%26newmaps=2%26smooth';			
+		  var srcImage = 'http://resize.wunderground.com/cgi-bin/resize_convert?ox=gif&url=radblast/cgi-bin/radar/WUNIDS_composite%3Fcenterlat='+newCenter.lat()+'%26centerlon='+newCenter.lng()+'%26radius='+newZoom+'%26newmaps=2%26smooth';			
 	      overlay = new RadarOverlay(bounds, srcImage, map); 		  
 		  
 		});	    
